@@ -18,21 +18,21 @@ def escrever_arquivo(caminho, conteudo):
 # Função de compressão
 def compressao(texto):
     comprimido = ""
-    i = 0
+    i = 0      
+
     while i < len(texto):
         count = 1
-        while i + 1 < len(texto) and texto[i] == texto[i + 1]:
+        while i + 1 < len(texto) and texto[i] == texto[i + 1] and texto[i] != '\n' and texto[i] != " ":
             i += 1
             count += 1
         if count >= 4:
             caracteres_armazenados.append(texto[i])
             caracteres_armazenados.append(f'#{count:0{1 if count < 10 else 2}d}')
             comprimido += f"{texto[i]}#{count:0{1 if count < 10 else 2}d}"
+            i+=1
         else:
             comprimido += texto[i] * count
-        i += 1
-    comprimido = comprimido.replace(" ", "@")  # Marca espaços com @
-    comprimido = comprimido.replace("\n", "#") # Marca novas linhas com #
+            i += 1
     return comprimido
 
 # Função de descompressão
@@ -45,26 +45,14 @@ def descompressao(texto):
             multiplicador = verificar_multiplicador(texto, i)
             descomprimido = verificar_posicoes(texto[i], caracteres_armazenados, descomprimido,i,multiplicador)
             total_index = controlador_index(multiplicador)
-            i += total_index
+            i += total_index 
         else:
-            if texto[i] == '@':
-                descomprimido += ' '
-                i += 1
-            elif texto[i:i+1] == '#':
-                descomprimido += '\n'
-                i += 1
-            else:
-                descomprimido += texto[i]
-                i += 1
+            descomprimido += texto[i]
+            i += 1
     return descomprimido
 
 #
 def verificar_posicoes(texto, caracteres_armazenados, descomprimido,i,multiplicador):
-            if texto == '#':
-                    texto = "\n"
-            elif texto == '@':
-                    texto = " "
-            
             for j in range(len(caracteres_armazenados)):
                 if texto == caracteres_armazenados[j]: 
                     if multiplicador == caracteres_armazenados[j+1]:
