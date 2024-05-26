@@ -2,7 +2,8 @@ import os
 
 # Variáveis iniciais
 texto = "test.txt"
-local = "D:/Victor/Programação/Projeto_Compressao_e_Descompressao_de_Dados/text/test.txt"
+local = "C:/Users/thayn/Desktop/Victor programacao/Projeto_Compressao_e_Descompressao_de_Dados/text/Test.txt"
+caracteres_armazenados = []
 
 # Função para ler o arquivo
 def ler_arquivo(caminho):
@@ -24,12 +25,14 @@ def compressao(texto):
             i += 1
             count += 1
         if count >= 4:
-            comprimido += f"{texto[i]}#{count:02d}"
+            caracteres_armazenados.append(texto[i])
+            caracteres_armazenados.append(f'#{count:0{1 if count < 10 else 2}d}')
+            comprimido += f"{texto[i]}#{count:0{1 if count < 10 else 2}d}"
         else:
             comprimido += texto[i] * count
         i += 1
-    comprimido = comprimido.replace(" ", "@")  # Marca espaços com @@
-    comprimido = comprimido.replace("\n", "#") # Marca novas linhas com ##
+    comprimido = comprimido.replace(" ", "@")  # Marca espaços com @
+    comprimido = comprimido.replace("\n", "#") # Marca novas linhas com #
     return comprimido
 
 # Função de descompressão
@@ -37,28 +40,65 @@ def descompressao(texto):
     descomprimido = ""
     i = 0
     while i < len(texto):
-        if texto[i:i+1] == '@':
-            if texto[i+1] == '#' and texto[i + 2:i + 4].isdigit():
-                char = texto[i]
-                char = char.replace("@", " ")
-                count = int(texto[i + 2:i + 4])
-                descomprimido += char * count
-                i += 4
-            else:
+        #Valida se a quantidade de letra é maior que 3
+        if i + 3 < len(texto) and texto[i + 1] == '#' and texto[i + 2].isdigit() or texto[i + 2:i + 4].isdigit():
+            multiplicador = verificar_multiplicador(texto, i)
+            descomprimido = verificar_posicoes(texto[i], caracteres_armazenados, descomprimido,i,multiplicador)
+            total_index = controlador_index(multiplicador)
+            i += total_index
+        else:
+            if texto[i] == '@':
                 descomprimido += ' '
                 i += 1
-        elif texto[i:i+1] == '#':
-            descomprimido += '\n'
-            i += 1
-        elif i + 3 < len(texto) and texto[i + 1] == '#' and texto[i + 2:i + 4].isdigit():
-            char = texto[i]
-            count = int(texto[i + 2:i + 4])
-            descomprimido += char * count
-            i += 4
-        else:
-            descomprimido += texto[i]
-            i += 1
+            elif texto[i:i+1] == '#':
+                descomprimido += '\n'
+                i += 1
+            else:
+                descomprimido += texto[i]
+                i += 1
     return descomprimido
+
+#
+def verificar_posicoes(texto, caracteres_armazenados, descomprimido,i,multiplicador):
+            if texto == '#':
+                    texto = "\n"
+            elif texto == '@':
+                    texto = " "
+            
+            for j in range(len(caracteres_armazenados)):
+                if texto == caracteres_armazenados[j]: 
+                    if multiplicador == caracteres_armazenados[j+1]:
+                        numero = caracteres_armazenados[j+1]
+                        numero = numero.replace("#", "")
+                        numero = int(numero)
+                        descomprimido += caracteres_armazenados[j] * numero
+                        return descomprimido
+                else:
+                    j+=1
+
+#Valida o número de vezes a ser posicionado uma letra
+def verificar_multiplicador(texto,i):
+        validador = 0
+        numero = 2
+        controlador = len(texto)
+        while validador == 0:
+            if texto[i + numero].isdigit() and i+numero+1 < controlador:
+                if texto[i+numero+1].isdigit():
+                    numero += 1
+                else:
+                    multiplicador = texto[i + 1:i + 1 + numero]
+                    validador = 1
+            else:     
+                multiplicador = texto[i + 1:i + 1 + numero]
+                validador = 1               
+        return multiplicador
+
+#Controla o número de indeices a ser pulado
+def controlador_index(multiplicador):
+        total = len(multiplicador)
+        total += 1
+        return total
+     
 
 # Caminho dos arquivos
 caminho_original = local
