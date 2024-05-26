@@ -22,7 +22,7 @@ def compressao(texto):
 
     while i < len(texto):
         count = 1
-        while i + 1 < len(texto) and texto[i] == texto[i + 1] and texto[i] != '\n' and texto[i] != " ":
+        while i + 1 < len(texto) and texto[i] == texto[i + 1] and texto[i] == '\n' or texto[i] == " ":
             i += 1
             count += 1
         if count >= 4:
