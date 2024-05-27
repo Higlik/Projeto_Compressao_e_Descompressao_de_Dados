@@ -22,9 +22,12 @@ def compressao(texto):
 
     while i < len(texto):
         count = 1
-        while i + 1 < len(texto) and texto[i] == texto[i + 1] and texto[i] == '\n' or texto[i] == " ":
-            i += 1
-            count += 1
+        while i + 1 < len(texto) and texto[i] == texto[i + 1]:
+            if texto[i] == '\n' or texto[i] == " ":
+                i += 1
+                count += 1
+            else:
+                break
         if count >= 4:
             caracteres_armazenados.append(texto[i])
             caracteres_armazenados.append(f'#{count:0{1 if count < 10 else 2}d}')
@@ -43,7 +46,7 @@ def descompressao(texto):
         #Valida se a quantidade de letra é maior que 3
         if i + 3 < len(texto) and texto[i + 1] == '#' and texto[i + 2].isdigit() or texto[i + 2:i + 4].isdigit():
             multiplicador = verificar_multiplicador(texto, i)
-            descomprimido = verificar_posicoes(texto[i], caracteres_armazenados, descomprimido,i,multiplicador)
+            descomprimido = verificar_posicoes(texto[i], caracteres_armazenados, descomprimido,multiplicador)
             total_index = controlador_index(multiplicador)
             i += total_index 
         else:
@@ -52,7 +55,7 @@ def descompressao(texto):
     return descomprimido
 
 #
-def verificar_posicoes(texto, caracteres_armazenados, descomprimido,i,multiplicador):
+def verificar_posicoes(texto, caracteres_armazenados, descomprimido,multiplicador):
             for j in range(len(caracteres_armazenados)):
                 if texto == caracteres_armazenados[j]: 
                     if multiplicador == caracteres_armazenados[j+1]:
